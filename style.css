@@ -1,40 +1,29 @@
-
-body {
-    margin: 0;
-    padding: 0;
-    overflow: hidden;
-    font-family: "Inter", sans-serif;
-    background-color: #D79B9B;
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-    overflow-y: scroll; 
-    overflow-x: hidden;
-}
-
-body::-webkit-scrollbar {
-    display: none;
-}
-
-/* --- HIDE SCROLLBARS --- */
-.scroll-wrapper {
-    height: 100vh;
-    width: 100vw;
-    overflow-y: scroll; /* Functional scroll */
-    scroll-snap-type: y mandatory;
-    scroll-behavior: smooth;
-    -ms-overflow-style: none;  /* IE and Edge */
-    scrollbar-width: none;     /* Firefox */
-}
-.scroll-wrapper::-webkit-scrollbar {
-    display: none; /* Chrome, Safari, Opera */
-}
-
 body {
     margin: 0;
     padding: 0;
     overflow: hidden;
     font-family: "Inter", sans-serif;
     color: #000;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+body::-webkit-scrollbar {
+    display: none;
+}
+
+.scroll-wrapper {
+    height: 100vh;
+    width: 100vw;
+    overflow-y: scroll; 
+    scroll-snap-type: y mandatory;
+    scroll-behavior: smooth;
+    -ms-overflow-style: none; 
+    scrollbar-width: none;    
+}
+
+.scroll-wrapper::-webkit-scrollbar {
+    display: none; 
 }
 
 canvas {
@@ -42,11 +31,12 @@ canvas {
     position: fixed;
     top: 0;
     left: 0;
-    z-index: 2;
-    pointer-events: none; /* Critical: allows clicking links "through" the canvas */
+    z-index: 2; /* Sits above background, below text */
+    pointer-events: none; 
     background: transparent !important; 
 }
 
+/* --- PAGE LAYOUT --- */
 .page-section {
     position: relative;
     height: 100vh;
@@ -54,14 +44,26 @@ canvas {
     scroll-snap-align: start;
 }
 
+#home {
+    /* Teal to Pink Gradient */
+    background: linear-gradient(180deg, #A8E6CF 0%, #D79B9B 100%);
+}
+
+.about-page {
+    /* Pink transitioning naturally into Purple and Green */
+    background: linear-gradient(180deg, #D79B9B 0%, #C1A2F5 50%, #D3F383 100%);
+    z-index: 1;
+}
+
+/* --- NAVIGATION --- */
 header, .mirrored-nav {
     position: absolute;
     width: 100%;
-    background-color: rgba(180, 200, 230, 0.327); 
+    background-color: rgbargba(255, 255, 255, 0.1); 
     backdrop-filter: blur(8px); 
     padding: 15px 50px;
     box-sizing: border-box;
-    z-index: 10;
+    z-index: 50;
 }
 
 header { top: 0; border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
@@ -76,59 +78,83 @@ nav a {
     border-bottom: 1.5px solid #000;
 }
 
-main { height: 100vh; display: flex; align-items: center; padding-left: 10%;}
-.content-box { max-width: 500px; font-weight: 600; z-index: 3; }
+main { 
+    height: 100vh; 
+    display: flex; 
+    align-items: center; 
+    padding-left: 10%;
+}
 
+.content-box { 
+    max-width: 500px; 
+    font-weight: 600; 
+    z-index: 10;
+    padding: 10px;
+    /* Soft white radial glow */
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.45) 0%, rgba(255, 255, 255, 0) 65%);
+    backdrop-filter: blur(8px);
+    border: none;
+}
 
+/* --- REFINED LOGO TRANSITION --- */
 .logo-anim-wrapper {
     position: fixed;
     left: 0;
-    bottom: 0;
+    top: 0; /* Always anchored to the top now */
     width: 100%;
-    z-index: 20;
-    transition: all 0.8s cubic-bezier(0.77, 0, 0.175, 1);
+    z-index: 100;
     pointer-events: none;
+    
+    /* Start at the bottom of the viewport */
+    /* Subtracting 100% of its own height ensures the logo sits flush at the bottom */
+    transform: translateY(calc(100vh - 100%)); 
+    
+    /* Your original smooth cubic-bezier */
+    transition: transform 0.8s cubic-bezier(0.77, 0, 0.175, 1);
 }
 
-.logo-anim-wrapper img { width: 100%; height: auto; transition: all 0.8s ease; }
-
-
-.logo-shrunk {
-    bottom: 55%; /* Moves up to align with headshot */
-    left: 46%;   /* Moves right */
-    width: 40%;  /* Shrinks size */
+.logo-anim-wrapper img { 
+    width: 100%; 
+    height: auto; 
+    display: block;
 }
 
-/* --- ABOUT PAGE --- */
-.about-page {
-    /* Gradient handled by CSS background, Grain handled by p5.js canvas */
-    background: linear-gradient(135deg, #d3f383 0%, #e1c4ff 50%, #c1a2f5 100%);
-    color: #000; /* Black text as requested */
-    z-index: 1;
+/* Land at the top smoothly by resetting the transform */
+.logo-scrolled {
+    transform: translateY(0);
 }
 
+/* --- ABOUT PAGE CONTENT --- */
 .about-content {
     display: flex;
     width: 85%;
-    height: 100%;
     max-width: 1200px;
     margin: 0 auto;
     height: 100vh;
     align-items: center;
 }
 
-.image-column { flex: 1; display: flex; align-items: flex-end; height: 80vh; }
+.image-column { 
+    flex: 1; 
+    display: flex; 
+    align-items: flex-end; /* Anchors content to bottom */
+    height: 100vh; 
+}
 
 .headshot {
     display: block;
-    max-height: 90vh; /* Scaled to fit screen height */
+    max-height: 85vh; /* Keeps it within view but large */
     width: auto;
-    transform: translateY(50px);
-    margin-bottom: 0; /* Ensures contact with bottom edge */
-    /* Optional: Purple tint to match visual reference */
+    margin-bottom: 0; /* Ensures it touches the floor */
 }
 
-.text-column { flex: 1.2; padding-left: 40px; }
-.logo-target-space { height: 120px; margin-bottom: 20px; } /* Empty space for shrunk logo */
+.text-column { flex: 1.2; padding-left: 40px; z-index: 45; }
+
+.big-hi {
+    font-size: 5rem;
+    font-weight: 800;
+    margin: 0 0 10px 0;
+    line-height: 1;
+}
 
 .bio-text p { font-size: 16px; line-height: 1.4; font-weight: 600; }
