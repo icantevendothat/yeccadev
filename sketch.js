@@ -1,168 +1,63 @@
-// let grainImage;
-// const scrollContainer = document.getElementById('main-scroll');
-
-// function setup() {
-//     createCanvas(windowWidth, windowHeight);
-    
-//     grainImage = createGraphics(width, height);
-//     grainImage.loadPixels();
-//     for (let i = 0; i < grainImage.width; i++) {
-//         for (let j = 0; j < grainImage.height; j++) {
-//             let grain = random(255);
-//             grainImage.set(i, j, color(grain, grain, grain, 15));
-//         }
-//     }
-//     grainImage.updatePixels();
-// }
-
-// function draw() {
-//     clear();
-    
-//     let scrollY = scrollContainer.scrollTop;
-//     let spacing = 40;
-    
-//     if (scrollY < windowHeight * 0.5) {
-//         // --- HOME PAGE GRID ---
-//         let focusRadius = 85;
-//         for (let x = spacing / 2; x < width; x += spacing) {
-//             for (let y = spacing / 2; y < height; y += spacing) {
-//                 let d = dist(mouseX, mouseY, x, y);
-//                 if (d < focusRadius) {
-//                     let size = map(d, 0, focusRadius, 16, 8);
-//                     drawGradientDot(x, y, size, 255, false);
-//                 } else {
-//                     drawGradientDot(x, y, 6, 255, true);
-//                 }
-//             }
-//         }
-//     } else {
-//         // --- ABOUT PAGE REVEAL LOGIC ---
-//         let revealRadius = 150; 
-//         for (let x = spacing / 2; x < width; x += spacing) {
-//             for (let y = spacing / 2; y < height; y += spacing) {
-//                 let d = dist(mouseX, mouseY, x, y);
-//                 if (d < revealRadius) {
-//                     // Reveal dots near mouse
-//                     let opacity = map(d, 0, revealRadius, 255, 0);
-//                     drawGradientDot(x, y, 10, opacity, false);
-//                 }
-//             }
-//         }
-//     }
-
-//     push();
-//     blendMode(OVERLAY);
-//     image(grainImage, 0, 0);
-//     pop();
-// }
-
-// function drawGradientDot(x, y, size, masterOpacity, isBlurred) {
-//     let ctx = canvas.getContext('2d');
-//     let alphaMult = masterOpacity / 255;
-//     let gradSize = isBlurred ? size * 2 : size / 2;
-//     let grad = ctx.createRadialGradient(x, y, 0, x, y, gradSize);
-    
-//     if (isBlurred) {
-//         grad.addColorStop(0, `rgba(230, 245, 255, ${0.2 * alphaMult})`);
-//         grad.addColorStop(1, `rgba(230, 245, 255, 0)`);
-//     } else {
-//         // Desaturated "Icy" Gradient (Less Blue)
-//         grad.addColorStop(0, `rgba(255, 255, 255, ${1 * alphaMult})`); 
-//         grad.addColorStop(0.5, `rgba(220, 240, 255, ${0.8 * alphaMult})`);
-//         grad.addColorStop(1, `rgba(180, 210, 255, ${0.4 * alphaMult})`);
-//     }
-    
-//     ctx.fillStyle = grad;
-//     ctx.beginPath();
-//     ctx.arc(x, y, isBlurred ? size * 1.5 : size / 2, 0, Math.PI * 2);
-//     ctx.fill();
-// }
-
-// document.querySelectorAll('.scroll-link').forEach(anchor => {
-//   anchor.addEventListener('click', function(e) {
-//       e.preventDefault();
-      
-//       const targetId = this.getAttribute('href');
-//       const targetElement = document.querySelector(targetId);
-      
-//       if (targetElement) {
-//           // Using the scroll-wrapper for the scroll action
-//           const container = document.getElementById('main-scroll');
-//           container.scrollTo({
-//               top: targetElement.offsetTop,
-//               behavior: 'smooth'
-//           });
-//       }
-//   });
-// });
-
-// function windowResized() {
-//     resizeCanvas(windowWidth, windowHeight);
-// }
-
 let grainImage;
+let dots = [];
+const spacing = 42;
+const words = ["STRATEGY", "DESIGN", "TECH", "CURIOSITY", "PASSION", "CONSULTING", "POWER"];
 const scrollContainer = document.getElementById('main-scroll');
 const logoWrapper = document.getElementById('dynamic-logo');
-
-// --- UPDATED LOGO TRIGGER ---
-scrollContainer.addEventListener('scroll', () => {
-    // When the user scrolls halfway to the About section
-    if (scrollContainer.scrollTop > window.innerHeight / 2) {
-        logoWrapper.classList.add('logo-scrolled');
-    } else {
-        logoWrapper.classList.remove('logo-scrolled');
-    }
-});
 
 function setup() {
     createCanvas(windowWidth, windowHeight);
     
-    // Create static grain texture
+    for (let x = spacing / 2; x < width; x += spacing) {
+        for (let y = spacing / 2; y < height; y += spacing) {
+            dots.push(new Dot(x, y));
+        }
+    }
+
+    // --- UNIFORM STRAIGHT LINE ABOVE MIRRORED NAV ---
+    for (let i = 0; i < words.length; i++) {
+        // Sequential selection ensures a stable, non-scattered row
+        let targetDot = dots[i]; 
+        targetDot.word = words[i];
+        targetDot.isPill = true;
+        
+        // Spread evenly across the width
+        let xPos = map(i, 0, words.length - 1, 0.1, 0.9);
+        
+        targetDot.pillTarget = {
+            x: width * xPos,
+            y: height * 0.88 // Positioned at the bottom, above the nav
+        };
+    }
+
     grainImage = createGraphics(width, height);
     grainImage.loadPixels();
     for (let i = 0; i < grainImage.width; i++) {
         for (let j = 0; j < grainImage.height; j++) {
             let grain = random(255);
-            grainImage.set(i, j, color(grain, grain, grain, 12));
+            grainImage.set(i, j, color(grain, grain, grain, 22)); 
         }
     }
     grainImage.updatePixels();
 }
 
 function draw() {
-  clear();
-  let scrollY = scrollContainer.scrollTop;
-  let spacing = 35;
-  
-  if (scrollY < windowHeight * 0.5) {
-      // HOME PAGE: Icy Dots
-      let focusRadius = 85; 
-      for (let x = spacing / 2; x < width; x += spacing) {
-          for (let y = spacing / 2; y < height; y += spacing) {
-              let d = dist(mouseX, mouseY, x, y);
-              if (d < focusRadius) {
-                  // Focus dots remain large (16px to 8px)
-                  let size = map(d, 0, focusRadius, 20, 10);
-                  drawGradientDot(x, y, size, 255, false);
-              } else {
-                  // Blurred dots are now much smaller (4px)
-                  drawGradientDot(x, y, 5, 255, true);
-              }
-          }
-      }
-  } else {
-        // ABOUT PAGE: Flashlight Reveal
-        let revealRadius = 150;
-        for (let x = spacing / 2; x < width; x += spacing) {
-            for (let y = spacing / 2; y < height; y += spacing) {
-                let d = dist(mouseX, mouseY, x, y);
-                if (d < revealRadius) {
-                    let opacity = map(d, 0, revealRadius, 255, 0);
-                    drawGradientDot(x, y, 10, opacity, false);
-                }
-            }
-        }
+    clear();
+    let scrollY = scrollContainer.scrollTop;
+    
+    // Slow cinematic transition (Changed back to 1.5 to match your working version)
+    let scrollPercent = constrain(scrollY / (windowHeight * 1.5), 0, 1);
+
+    if (scrollY > windowHeight * 0.45) {
+        logoWrapper.classList.add('logo-shrunk');
+    } else {
+        logoWrapper.classList.remove('logo-shrunk');
     }
+
+    dots.forEach(dot => {
+        dot.update(scrollPercent);
+        dot.display(scrollPercent);
+    });
 
     push();
     blendMode(OVERLAY);
@@ -170,42 +65,91 @@ function draw() {
     pop();
 }
 
-function drawGradientDot(x, y, size, masterOpacity, isBlurred) {
-  let ctx = canvas.getContext('2d');
-  let alphaMult = masterOpacity / 255;
-  
-  // For blurred dots, we use a smaller radius to keep them delicate
-  let gradSize = isBlurred ? size * 1.5 : size / 2;
-  let grad = ctx.createRadialGradient(x, y, 0, x, y, gradSize);
-  
-  if (isBlurred) {
-      // Smaller, but clearly visible icy glow
-      grad.addColorStop(0, `rgba(230, 245, 255, ${0.4 * alphaMult})`);
-      grad.addColorStop(1, `rgba(230, 245, 255, 0)`);
-  } else {
-      grad.addColorStop(0, `rgba(255, 255, 255, ${1 * alphaMult})`); 
-      grad.addColorStop(1, `rgba(180, 215, 255, ${0.4 * alphaMult})`);
-  }
-  
-  ctx.fillStyle = grad;
-  ctx.beginPath();
-  // Blurred dots have a smaller arc now to keep them tidy
-  ctx.arc(x, y, isBlurred ? size * 1.2 : size / 2, 0, Math.PI * 2);
-  ctx.fill();
-}
+class Dot {
+    constructor(x, y) {
+        this.homePos = createVector(x, y);
+        this.pos = createVector(x, y);
+        this.isPill = false;
+        this.word = "";
+        this.pillTarget = createVector(0, 0);
+        this.currentSize = 6;
+        this.noiseSeed = random(1000); 
+    }
 
-// SMOOTH NAVIGATION
-document.querySelectorAll('.scroll-link').forEach(anchor => {
-    anchor.addEventListener('click', function(e) {
-        e.preventDefault();
-        const target = document.querySelector(this.getAttribute('href'));
-        if (target) {
-            scrollContainer.scrollTo({
-                top: target.offsetTop,
-                behavior: 'smooth'
-            });
+    update(percent) {
+        if (this.isPill) {
+            let eased = 1 - Math.pow(1 - percent, 3); 
+            
+            // Subtle Organic Drift
+            let driftX = map(noise(this.noiseSeed + frameCount * 0.01), 0, 1, -8, 8);
+            let driftY = map(noise(this.noiseSeed + 500 + frameCount * 0.01), 0, 1, -5, 5);
+
+            let targetX = lerp(this.homePos.x, this.pillTarget.x, eased) + (driftX * percent);
+            let targetY = lerp(this.homePos.y, this.pillTarget.y, eased) + (driftY * percent);
+            
+            this.pos.x = targetX;
+            this.pos.y = targetY;
         }
-    });
-});
+    }
+
+    display(percent) {
+        let d = dist(mouseX, mouseY, this.pos.x, this.pos.y);
+        let targetSize = 6;
+        let opacity = 255;
+
+        if (percent < 0.3) {
+            if (d < 140) targetSize = map(pow(d / 140, 1.5), 0, 1, 30, 6);
+        } else {
+            if (this.isPill) {
+                targetSize = (d < 150) ? map(d, 0, 150, 75, 30) : 30;
+            } else {
+                opacity = map(percent, 0.2, 0.5, 255, 0);
+            }
+        }
+
+        this.currentSize = lerp(this.currentSize, targetSize, 0.1);
+
+        if (opacity <= 0) return;
+        this.drawPill(this.pos.x, this.pos.y, this.currentSize, opacity, this.word, percent);
+    }
+
+    drawPill(x, y, size, opacity, word, percent) {
+        let alpha = opacity / 255;
+        let ctx = canvas.getContext('2d');
+        
+        ctx.save();
+        
+        if (this.isPill && percent > 0.6) {
+            let glowRadius = size * 2.8; 
+            let grad = ctx.createRadialGradient(x, y, 0, x, y, glowRadius);
+            grad.addColorStop(0, `rgba(245, 248, 252, ${0.8 * alpha})`); 
+            grad.addColorStop(0.6, `rgba(215, 225, 235, ${0.2 * alpha})`);
+            grad.addColorStop(1, `rgba(185, 195, 205, 0)`);
+            
+            ctx.fillStyle = grad;
+            ctx.beginPath();
+            ctx.arc(x, y, glowRadius, 0, Math.PI * 2);
+            ctx.fill();
+
+            // --- UPDATED FONT & WEIGHT ---
+            ctx.font = `200 ${size * 0.45}px "urbane", "Inter", Arial, sans-serif`;
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            ctx.fillStyle = "#000000";
+            ctx.globalAlpha = alpha;
+            ctx.fillText(word.toUpperCase(), x, y);
+            
+        } else {
+            let grad = ctx.createRadialGradient(x, y, 0, x, y, size);
+            grad.addColorStop(0, `rgba(235, 238, 242, ${0.9 * alpha})`);
+            grad.addColorStop(1, `rgba(185, 195, 205, 0)`);
+            ctx.fillStyle = grad;
+            ctx.beginPath();
+            ctx.arc(x, y, size, 0, Math.PI * 2);
+            ctx.fill();
+        }
+        ctx.restore();
+    }
+}
 
 function windowResized() { resizeCanvas(windowWidth, windowHeight); }
