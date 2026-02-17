@@ -21,6 +21,39 @@ body {
     font-style: normal;
 }
 
+.logo-anim-wrapper, 
+.content-box, 
+.home-nav {
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 2s ease, transform 2s ease;
+}
+
+/* Once the JS adds this class, everything fades in */
+body.intro-complete .logo-anim-wrapper {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+body.intro-complete .content-box, 
+body.intro-complete .home-nav {
+    opacity: 1;
+    transform: translateY(0);
+    transition-delay: 0.5s; /* Content follows the logo slightly */
+}
+
+/* --- UPDATED MAIN LAYOUT --- */
+main { 
+    height: 100vh; 
+    display: flex; 
+    justify-content: center;
+    /* This centers the text vertically. 
+       Adjust 'padding-top' if you want it closer to the logo */ 
+    padding-top: 200px; 
+    box-sizing: border-box;
+    text-align: center;
+}
+
 /* Specific styling for your text elements */
 .home-blurb, .bio-text, .text-column h1 {
     font-family: "urbane", sans-serif;
@@ -43,10 +76,12 @@ body {
     scroll-snap-type: y mandatory;
     scroll-behavior: smooth;
     background-image: 
-        /* Top Left Teal Pocket */
-        radial-gradient(circle at 15% 15%, rgba(168, 230, 207, 0.7) 0%, transparent 40%),
-        /* Bottom Right Lime Highlight - Luminous presence */
-        radial-gradient(circle at 85% 90%, rgba(211, 243, 131, 0.45) 0%, transparent 45%);
+        /* Top Left - Soft Teal */
+        radial-gradient(circle at 15% 15%, rgba(100, 230, 220, 0.6) 0%, transparent 45%),
+        /* Bottom Right - Electric Blue/Teal (Replacing the yellow) */
+        radial-gradient(circle at 85% 90%, rgba(0, 190, 255, 0.4) 0%, transparent 50%),
+        /* Optional: Deep Center Teal for more depth */
+        radial-gradient(circle at 50% 50%, rgba(40, 120, 180, 0.2) 0%, transparent 60%);
     background-attachment: fixed;
 }
 
@@ -93,14 +128,19 @@ canvas {
 }
 
 /* --- NAVIGATION --- */
+/* --- UPDATED NAVIGATION (One word in each corner) --- */
 .home-nav {
     position: absolute;
-    top: 25%; /* Moves it just below the initial large logo */
+    bottom: 0; /* Pushes to the bottom of the screen */
+    left: 0;
     width: 100%;
-    padding: 0 32px; /* Reduced vertical padding since it's now top-aligned */
+    padding: 32px; /* Adjust spacing from the edges */
     box-sizing: border-box;
     z-index: 50;
 }
+
+/* Ensure the nav flexbox spreads items to the far edges */
+
 
 .mirrored-nav {
     position: absolute;
@@ -115,7 +155,12 @@ canvas {
     border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-nav { display: flex; justify-content: space-between; }
+nav { 
+    display: flex; 
+    justify-content: space-between; 
+    width: 100%;
+}
+
 nav a { 
     text-decoration: none; 
     color: #000; 
@@ -131,23 +176,20 @@ nav a:hover {
     transform: translateY(-1px);
 }
 
-main { 
+/* main { 
     height: 100vh; 
     display: flex; 
-    /* Centers the blurb horizontally and pushes it to the bottom */
     justify-content: center;
     align-items: flex-end; 
-    padding-bottom: 50px; /* Space above the nav bar */
+    padding-bottom: 50px; 
     box-sizing: border-box;
     text-align: center;
-}
+} */
 
 .content-box { 
-    max-width: 1300px; /* Wider for the centered look */
+    max-width: 100vw; /* Narrower width helps it look like a "subhead" under a logo */
     z-index: 10;
-    padding: 0; /* Removed padding since background is gone */
-    background: none !important; /* Removed the glassy background */
-    backdrop-filter: none !important;
+    background: none !important;
 }
 
 .content-box p {
